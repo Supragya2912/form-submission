@@ -4,6 +4,7 @@ import { Card, Typography, TextField, Button, InputLabel, FormControl, Select, M
 import { useNavigate } from "react-router-dom";
 
 const ThirdForm = () => {
+  
   const [acceptTerms, setAcceptTerms] = useState(false);
   const Navigate = useNavigate();
 
