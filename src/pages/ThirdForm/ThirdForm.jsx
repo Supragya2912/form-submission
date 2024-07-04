@@ -1,16 +1,98 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./ThirdForm.css";
-import { Card, Typography, TextField, Button, InputLabel, FormControl, Select, MenuItem, Checkbox, FormControlLabel } from "@mui/material";
+import {
+  Card,
+  Typography,
+  TextField,
+  Button,
+  InputLabel,
+  FormControl,
+  Select,
+  MenuItem,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { validatePhoneNumber } from "../../helper/helpers";
+import { handleSubmitForm } from "../../api/api";
 
 const ThirdForm = () => {
-  
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [data, setData] = useState({
+    emailId: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    address: "",
+    countryCode: "",
+    phoneNumber: "",
+    acceptTerms: false,
+  });
   const Navigate = useNavigate();
 
   const handleAcceptTermsChange = (event) => {
-    setAcceptTerms(event.target.checked);
+    setData({ ...data, acceptTerms: event.target.checked });
   };
+
+  const handleFormSubmit = async () => {
+    if (
+      data.phoneNumber === "" ||
+      data.countryCode === "" ||
+      !data.acceptTerms
+    ) {
+      alert("sss");
+      return;
+    }
+
+    if (!validatePhoneNumber(data.phoneNumber)) {
+      alert("Please enter a valid phone number");
+      return;
+    }
+
+    delete data.acceptTerms;
+
+    const response = await handleSubmitForm(data);
+    if (response?.message === "Success") {
+      alert("Form submitted successfully");
+      localStorage.clear();
+      Navigate("/");
+    } else {
+      alert("Internal server error");
+    }
+  };
+
+  useEffect(() => {
+    const form1 = localStorage.getItem("form1");
+    const form2 = localStorage.getItem("form2");
+    const form3 = localStorage.getItem("form3");
+
+    if(form1) {
+      const parsedData = JSON.parse(form1);
+      setData((prevState) => ({
+        ...prevState,
+        emailId: parsedData.email,
+        password: parsedData.password
+      }));
+    }
+
+    if(form2) {
+      const parsedData = JSON.parse(form2);
+      setData((prevState) => ({
+        ...prevState,
+        firstName: parsedData.firstName,
+        lastName: parsedData.lastName,
+        address: parsedData.address
+      }));
+    }
+
+    if(form3) {
+      const parsedData = JSON.parse(form3);
+      setData((prevState) => ({
+        ...prevState,
+        countryCode: parsedData.countryCode,
+        phoneNumber: parsedData.phoneNumber
+      }));
+    }
+  }, []);
 
   return (
     <div className="container">
@@ -23,12 +105,17 @@ const ThirdForm = () => {
             <label> Please enter your phone number</label>
             <div className="phone-input">
               <FormControl variant="standard" className="country-code">
-                <InputLabel id="demo-customized-select-label">Country Code</InputLabel>
+                <InputLabel id="demo-customized-select-label">
+                  Country Code
+                </InputLabel>
                 <Select
                   labelId="demo-customized-select-label"
                   id="demo-customized-select"
                   color="success"
-                  defaultValue=""
+                  value={data.countryCode}
+                  onChange={(e) => {
+                    setData({ ...data, countryCode: e.target.value });
+                  }}
                 >
                   <MenuItem value={"+91"}>+91</MenuItem>
                   <MenuItem value={"+1"}>+1</MenuItem>
@@ -41,6 +128,10 @@ const ThirdForm = () => {
                 color="success"
                 className="phone-number"
                 fullWidth
+                value={data.phoneNumber}
+                onChange={(e) => {
+                  setData({ ...data, phoneNumber: e.target.value });
+                }}
               />
             </div>
           </div>
@@ -48,7 +139,7 @@ const ThirdForm = () => {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={acceptTerms}
+                  checked={data.acceptTerms}
                   onChange={handleAcceptTermsChange}
                   name="acceptTerms"
                   color="success"
@@ -62,18 +153,23 @@ const ThirdForm = () => {
               variant="contained"
               color="secondary"
               sx={{ width: "30%" }}
-              onClick={() => Navigate('/second')}
+              onClick={() => Navigate("/second")}
             >
               Back
             </Button>
-            <Button variant="contained" sx={{ width: "30%" }}>
+            <Button
+              variant="contained"
+              sx={{ width: "30%" }}
+              onClick={handleFormSubmit}
+              disabled={!data.acceptTerms}
+            >
               Save
             </Button>
             <Button
               variant="contained"
               sx={{ width: "30%" }}
               color="success"
-              disabled={!acceptTerms}
+              disabled
             >
               Save & Next
             </Button>

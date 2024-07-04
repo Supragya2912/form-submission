@@ -21,13 +21,13 @@ export const passwordValidation = (password) => {
 }
 
 // Allow only alphabets. Minimum of 2 character and maximum 50.
-export const firtNameValidation = (firstName) => {
+export const firstNameValidation = (firstName) => {
     const nameRegex = /^[a-zA-Z]{2,50}$/;
     return nameRegex.test(firstName);
 }
 
 export const lastNameValidation = (lastName) => {
-    const nameRegex = /^[a-zA-Z]$/;
+    const nameRegex = /^[a-zA-Z]+$/;
     return nameRegex.test(lastName);
 }
 
