@@ -1,74 +1,67 @@
-import React,{useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import "./FirstForm.css";
-import { Card, Typography, TextField, Button , InputAdornment, IconButton } from "@mui/material";
+import { Card, Typography, TextField, Button, InputAdornment, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { emailValidation, passwordValidation } from "../../helper/helpers";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useDispatch, useSelector } from "react-redux";
+import { saveForm1 } from "../../redux/reducers/formReducer";
 
 const FirstForm = () => {
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [formOne, setFormOne] = useState({
-    email: "",
-    password: "",
-    emailError: "",
-    passwordError: "",
-    hidePassword: true
-  });
+  const form1 = useSelector((state) => state.form.form1);
+  const [formOne, setFormOne] = useState(form1);
 
   const handleSaveAndNext = () => {
-
-    if(formOne.email === "" || formOne.password === "" ) {
+    if (formOne.email === "" || formOne.password === "") {
       alert("Please fill all the fields");
       return;
     }
 
-    if(!emailValidation(formOne.email)){
-      setFormOne({...formOne, emailError: "Please enter a valid email"});
+    if (!emailValidation(formOne.email)) {
+      setFormOne({ ...formOne, emailError: "Please enter a valid email" });
       return;
     }
 
-    if(!passwordValidation(formOne.password)){
-      setFormOne({...formOne, passwordError: "Must contain minimum 2 capital letters, 2 small letter, 2 numbers and 2 special characters"});
+    if (!passwordValidation(formOne.password)) {
+      setFormOne({ ...formOne, passwordError: "Must contain minimum 2 capital letters, 2 small letters, 2 numbers and 2 special characters" });
       return;
     }
-    localStorage.setItem("form1", JSON.stringify(formOne));
+
+    dispatch(saveForm1(formOne));
     navigate("/second");
   };
 
   const handleSave = () => {
-
-    if(formOne.email === "" || formOne.password === "" ) {
+    if (formOne.email === "" || formOne.password === "") {
       alert("Please fill all the fields");
       return;
     }
 
-    if(!emailValidation(formOne.email)){
-      setFormOne({...formOne, emailError: "Please enter a valid email"});
+    if (!emailValidation(formOne.email)) {
+      setFormOne({ ...formOne, emailError: "Please enter a valid email" });
       return;
     }
 
-    if(!passwordValidation(formOne.password)){
-      setFormOne({...formOne, passwordError: "Must contain minimum 2 capital letters, 2 small letter, 2 numbers and 2 special characters"});
+    if (!passwordValidation(formOne.password)) {
+      setFormOne({ ...formOne, passwordError: "Must contain minimum 2 capital letters, 2 small letters, 2 numbers and 2 special characters" });
       return;
     }
 
-    localStorage.setItem("form1", JSON.stringify(formOne));
-  }
+    dispatch(saveForm1(formOne));
+  };
 
   const togglePassword = () => {
-    setFormOne({...formOne, hidePassword: !formOne.hidePassword});
-  }
+    setFormOne({ ...formOne, hidePassword: !formOne.hidePassword });
+  };
 
   useEffect(() => {
-    const data = localStorage.getItem("form1");
-    if(data) {
-      const parsedData = JSON.parse(data);
-      setFormOne(parsedData);
+    if (form1) {
+      setFormOne(form1);
     }
-  }
-  ,[]);
-  
+  }, [form1]);
+
   return (
     <div className="container">
       <div className="inner-container">
@@ -83,12 +76,12 @@ const FirstForm = () => {
               label="Email"
               variant="outlined"
               color="success"
-              value={formOne.email}
+              value={formOne?.email}
               onChange={(e) => {
-                setFormOne({ ...formOne, email: e.target.value, emailError: ""});
+                setFormOne({ ...formOne, email: e.target.value, emailError: "" });
               }}
-              error={!!formOne.emailError}
-              helperText={formOne.emailError}
+              error={!!formOne?.emailError}
+              helperText={formOne?.emailError}
             />
           </div>
           <div className="password">
@@ -97,22 +90,19 @@ const FirstForm = () => {
               id="outlined-basic"
               label="Password"
               variant="outlined"
-              type={formOne.hidePassword ? "password" : "text"}
+              type={formOne?.hidePassword ? "password" : "text"}
               color="success"
-              value={formOne.password}
+              value={formOne?.password}
               onChange={(e) => {
                 setFormOne({ ...formOne, password: e.target.value, passwordError: "" });
               }}
-              error={!!formOne.passwordError}
-              helperText={formOne.passwordError}
+              error={!!formOne?.passwordError}
+              helperText={formOne?.passwordError}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={togglePassword}
-                      edge="end"
-                    >
-                      {formOne.hidePassword ? <Visibility /> : <VisibilityOff />}
+                    <IconButton onClick={togglePassword} edge="end">
+                      {formOne?.hidePassword ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
                 )

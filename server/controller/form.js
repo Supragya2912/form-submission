@@ -4,9 +4,9 @@ const bcrypt = require('bcrypt');
 const submitForm = async (req, res) => {
 
     try {
-        const { emailId, password, phoneNumber, countryCode, firstName, lastName , address} = req.body;
+        const { email, password, phoneNumber, countryCode, firstName, lastName , address} = req.body;
 
-        if (!emailId || !password || !phoneNumber || !countryCode || !firstName  || !address) {
+        if (!email || !password || !phoneNumber || !countryCode || !firstName  || !address) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -16,12 +16,12 @@ const submitForm = async (req, res) => {
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(emailId)) {
+        if (!emailRegex.test(email)) {
             return res.status(400).json({ message: 'Invalid email' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ emailId, password:hashedPassword, phoneNumber, countryCode, firstName, lastName , address});
+        const user = new User({ email, password:hashedPassword, phoneNumber, countryCode, firstName, lastName , address});
         await user.save();
 
         res.status(201).json({ message: 'Success', data: user });
